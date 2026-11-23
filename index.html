@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robot Rampage Reloaded</title>
+<meta name="description" content="You're a giant robot. The city is in the way. A side-scrolling destruction game for iPhone by American Made Games.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: mission briefing with a grin — short, punchy, uppercase labels
+   IDEA: the game's own sci-fi HUD: corner-tick panels, cyan glow, gold only for scrap
+   PICTURE: real gameplay captures framed as HUD screens
+   COLOUR and TYPE: navy panels, cyan #46D6FF hero, gold #FFD36A rewards; Rajdhani throughout
+   LAYOUT: hero screen, stat strip, gameplay rows, worlds grid, skins, features, footer; #privacy and #support views */
+:root{color-scheme:dark;--bg:#060a12;--bg2:#0b1220;--ink:#eaf3fb;--dim:rgba(205,220,235,.7);--cy:#46d6ff;--cyh:#a8f0ff;--cyd:#1679b8;--gold:#ffd36a;--red:#ff5d6c;--grn:#5ff2a6;--line:rgba(130,205,255,.2);--pan:linear-gradient(180deg,rgba(14,22,36,.85),rgba(6,10,18,.85))}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.55 Rajdhani,"Arial Narrow",Arial,sans-serif;overflow-x:clip}
+img{display:block;max-width:100%;height:auto}
+a{color:var(--cy)}
+h1,h2,h3{font-weight:700;text-transform:uppercase;letter-spacing:.08em;line-height:1.05;margin:0;text-wrap:balance}
+h2{font-size:clamp(32px,4.4vw,48px)}
+h3{font-size:22px;letter-spacing:.1em}
+p{margin:0 0 1em}
+.wrap{max-width:1240px;margin:0 auto}
+.band{padding:clamp(48px,7vw,96px) max(5vw,16px);position:relative}
+.lab{font-weight:700;text-transform:uppercase;letter-spacing:.18em;font-size:14px;color:var(--cy)}
+.lead{font-size:clamp(18px,2vw,21px);color:var(--dim);max-width:62ch}
+/* backdrop */
+.fx{position:fixed;inset:0;pointer-events:none;z-index:0}
+.fx::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 70% 0%,rgba(70,214,255,.14),transparent 70%),radial-gradient(40% 40% at 0% 60%,rgba(22,121,184,.12),transparent 70%)}
+.fx::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);animation:scan 12s linear infinite}
+@keyframes scan{to{background-position:0 60px}}
+.em{position:absolute;bottom:-10px;width:3px;height:3px;border-radius:50%;background:var(--cy);box-shadow:0 0 8px var(--cy);opacity:0;animation:rise linear infinite}
+.em.g{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+@keyframes rise{0%{transform:translateY(0);opacity:0}10%{opacity:.8}100%{transform:translateY(-105vh) translateX(30px);opacity:0}}
+main,header,footer{position:relative;z-index:1}
+/* nav */
+header{position:sticky;top:0;z-index:10;background:rgba(6,10,18,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:20px;padding:10px max(5vw,16px);max-width:1340px;margin:0 auto;flex-wrap:wrap}
+.logo{display:flex;align-items:baseline;gap:6px;text-decoration:none;font-weight:700;letter-spacing:.06em;font-size:24px;line-height:1}
+.logo .s{background:linear-gradient(180deg,#fff,#b4c2d0 55%,#66788a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo .c{background:linear-gradient(180deg,#e6fbff,#46d6ff 55%,#1466a6);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 8px rgba(70,214,255,.5))}
+.logo .r{font-size:11px;letter-spacing:.3em;color:#fff;border:1px solid var(--cy);padding:3px 6px 2px;transform:skewX(-14deg);align-self:center}
+.links{display:flex;gap:4px 18px;margin-left:auto;flex-wrap:wrap}
+.links a{color:var(--dim);text-decoration:none;font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:14px;padding:12px 2px;min-height:44px;display:inline-flex;align-items:center}
+.links a:hover,.links a[aria-current]{color:var(--cyh)}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 28px;border-radius:10px;font:700 18px Rajdhani,sans-serif;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;position:relative;overflow:hidden}
+.btn.p{background:linear-gradient(180deg,#a8f0ff,#46d6ff 45%,#1679b8);color:#04111d;box-shadow:0 0 24px rgba(70,214,255,.45),inset 0 1px 0 rgba(255,255,255,.7);animation:breathe 3.2s ease-in-out infinite}
+.btn.p::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.65) 50%,transparent 65%);transform:translateX(-120%);animation:sweep 4.5s ease-in-out infinite}
+.soon{cursor:default}
+.btn.o{color:var(--cyh);border:1px solid var(--line);background:var(--pan)}
+.btn.o:hover{border-color:var(--cy)}
+.btn:focus-visible,.links a:focus-visible{outline:2px solid var(--cyh);outline-offset:3px}
+@keyframes breathe{50%{box-shadow:0 0 38px rgba(70,214,255,.7),inset 0 1px 0 rgba(255,255,255,.7)}}
+@keyframes sweep{0%,60%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+/* HUD panel with corner ticks */
+.hud{position:relative;background:var(--pan);border:1px solid var(--line);border-radius:10px}
+.hud::before,.hud::after{content:"";position:absolute;width:16px;height:16px;border:2px solid var(--cy);pointer-events:none}
+.hud::before{top:-1px;left:-1px;border-right:0;border-bottom:0;border-top-left-radius:10px}
+.hud::after{bottom:-1px;right:-1px;border-left:0;border-top:0;border-bottom-right-radius:10px}
+.shot{padding:6px}.shot img{border-radius:6px;width:100%;aspect-ratio:16/9;object-fit:cover}
+/* hero */
+.hero{padding-top:clamp(28px,5vw,64px);text-align:center}
+.hero h1{font-size:clamp(40px,7vw,84px);letter-spacing:.06em}
+.hero h1 .c{color:var(--cy);text-shadow:0 0 28px rgba(70,214,255,.55)}
+.hero .lead{margin:18px auto 26px;text-align:center}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.note{font-size:14px;color:var(--dim);margin-top:12px}
+.heroShot{margin:clamp(28px,4vw,48px) auto 0;max-width:1180px;box-shadow:0 30px 80px -20px rgba(70,214,255,.35)}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:1240px;margin:0 auto}
+.stat{padding:18px 16px;text-align:center}
+.stat b{display:block;font-size:clamp(36px,4.5vw,52px);line-height:1;color:var(--cyh)}
+.stat span{font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:14px;color:var(--dim)}
+/* feature rows */
+.row{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:center;margin-top:clamp(40px,6vw,72px)}
+.row.flip>.shot{order:2}
+.row h3{font-size:clamp(26px,3vw,34px);margin:8px 0 14px}
+.ticks{list-style:none;padding:0;margin:0}
+.ticks li{padding-left:22px;position:relative;margin:6px 0;color:var(--dim)}
+.ticks li::before{content:"";position:absolute;left:2px;top:.55em;width:8px;height:8px;border:2px solid var(--cy);transform:rotate(45deg)}
+/* worlds */
+.worlds{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;margin-top:36px}
+.world{grid-column:span 2;overflow:hidden;display:flex;flex-direction:column}
+.world:nth-child(4),.world:nth-child(5){grid-column:span 3}
+.world img{aspect-ratio:16/9;object-fit:cover;width:100%;border-radius:9px 9px 0 0}
+.world .b{padding:16px 18px 20px;border-top:2px solid var(--wc)}
+.tag{display:inline-block;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--wc);border:1px solid var(--wc);border-radius:99px;padding:2px 10px;margin-bottom:8px}
+.world h3{margin-bottom:6px}
+.world p{color:var(--dim);margin:0;font-size:16px}
+.world .en{margin-top:10px;font-size:15px;color:var(--ink)}
+/* skins */
+.skins{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(24px,4vw,56px);align-items:start;margin-top:36px}
+.sk{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.sk li{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:12px 16px;border-bottom:1px solid var(--line)}
+.sk li.star{background:linear-gradient(90deg,rgba(70,214,255,.1),transparent);border-radius:8px}
+.sk strong{font-size:19px;letter-spacing:.06em;text-transform:uppercase}
+.sk small{display:block;color:var(--dim);font-size:15px}
+.price{color:var(--gold);font-weight:700;white-space:nowrap;font-size:17px}
+.price.free{color:var(--grn)}
+.carhead{display:flex;justify-content:space-between;align-items:center;margin-top:32px;gap:12px}
+.carbtns{display:flex;gap:10px}
+.cb{width:48px;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--pan);color:var(--cyh);font:700 28px/1 Rajdhani,sans-serif;cursor:pointer}
+.cb:hover:not(:disabled){border-color:var(--cy)}.cb:disabled{opacity:.35;cursor:default}.cb:focus-visible{outline:2px solid var(--cyh);outline-offset:3px}
+.car{list-style:none;margin:14px 0 0;padding:4px 2px 18px;display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 48px)/4);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--cyd) transparent}
+.sc{scroll-snap-align:start;overflow:hidden;display:flex;flex-direction:column}
+.sc img{width:100%;aspect-ratio:564/436;object-fit:cover;border-radius:9px 9px 0 0}
+.sc .b{padding:14px 16px 18px;border-top:2px solid var(--sc)}
+.sc h3{font-size:20px;color:var(--sc)}
+.sc p{margin:6px 0 0;color:var(--dim);font-size:16px}
+/* feature grid */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:36px}
+.card{padding:22px 22px 18px}
+.card h3{font-size:20px;margin-bottom:8px;color:var(--cyh)}
+.card p{color:var(--dim);margin:0;font-size:16px}
+.ic{width:34px;height:34px;margin-bottom:12px;color:var(--cy)}
+/* closer */
+.closer{text-align:center}
+.closer h2{font-size:clamp(36px,6vw,72px)}
+.closer .lead{margin:16px auto 26px}
+/* doc pages */
+.doc{max-width:820px;margin:0 auto}
+.doc h1{font-size:clamp(36px,5vw,52px);margin:10px 0 8px}
+.doc h2{font-size:24px;letter-spacing:.1em;margin:36px 0 10px;color:var(--cyh)}
+.doc p,.doc li{color:#d3e1ee}
+.doc ul{padding-left:20px}
+.doc li{margin:6px 0}
+.big{padding:clamp(22px,4vw,36px);margin:26px 0;text-align:center}
+.big .lab{color:var(--grn)}
+.big p{font-size:clamp(22px,3vw,30px);font-weight:700;margin:8px 0 0;color:var(--ink);line-height:1.2}
+.mail{display:flex;flex-direction:column;align-items:center;gap:14px}
+.addr{font-size:clamp(18px,4.6vw,30px);font-weight:700;color:var(--cyh);overflow-wrap:anywhere;user-select:all}
+.row2{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.copied{color:var(--grn);font-size:15px;min-height:1.4em}
+details{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;padding:16px 4px;font-weight:700;font-size:19px;list-style:none;display:flex;justify-content:space-between;gap:12px;min-height:44px}
+summary::after{content:"+";color:var(--cy);font-size:24px;line-height:1}
+details[open] summary::after{content:"–"}
+details>div{padding:0 4px 14px;color:#d3e1ee}
+.meta{color:var(--dim);font-size:15px}
+/* footer */
+footer{border-top:1px solid var(--line);padding:32px max(5vw,16px);background:rgba(6,10,18,.9)}
+.foot{max-width:1240px;margin:0 auto;display:flex;gap:16px 32px;flex-wrap:wrap;align-items:center;justify-content:space-between;color:var(--dim);font-size:15px}
+.foot nav{display:flex;gap:20px;flex-wrap:wrap}
+.foot a{color:var(--dim);text-decoration:none;text-transform:uppercase;letter-spacing:.12em;font-weight:700;font-size:14px;padding:10px 0}
+.foot a:hover{color:var(--cyh)}
+[data-view][hidden]{display:none}
+@media(max-width:900px){.car{grid-auto-columns:calc((100% - 32px)/3)}.worlds{grid-template-columns:repeat(2,minmax(0,1fr))}.world,.world:nth-child(4),.world:nth-child(5){grid-column:span 1}.world:nth-child(5){grid-column:span 2}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.skins{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.soon{font-size:16px;letter-spacing:.08em;padding:0 16px}.car{grid-auto-columns:78%}.carhead .meta{font-size:14px}.links{margin-left:0;width:100%;gap:0 16px}.links a{font-size:13px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.row,.row.flip{grid-template-columns:minmax(0,1fr)}.row.flip>.shot{order:0}.worlds,.grid{grid-template-columns:minmax(0,1fr)}.world:nth-child(5){grid-column:span 1}.btn{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}.em{display:none}}
+</style>
+</head>
+<body>
+<div class="fx" id="fx" aria-hidden="true"></div>
+
+<header>
+  <div class="nav">
+    <a class="logo" href="#top" aria-label="Robot Rampage Reloaded home"><span class="s">ROBOT</span><span class="c">RAMPAGE</span><span class="r">RELOADED</span></a>
+    <nav class="links" aria-label="Main">
+      <a href="#gameplay">Gameplay</a>
+      <a href="#worlds">Worlds</a>
+      <a href="#skins">Skins</a>
+      <a href="#support">Support</a>
+      <a href="#privacy">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ================= HOME ================= -->
+<div data-view="home">
+  <section class="band hero" id="top">
+    <div class="wrap">
+      <h1>You're a giant robot.<br><span class="c">The city is in the way.</span></h1>
+      <p class="lead">Walk right and level every building in the sector to open the gate. The military will send tanks, helicopters, jets and enemy mechs to stop you. You've got a laser, a jetpack and a nuke.</p>
+      <div class="cta"><span class="btn p soon" role="note"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>Coming soon to the App Store</span></div>
+      <div class="hud shot heroShot"><img src="img/hero.jpg" width="1600" height="900" alt="Gameplay in The City: the robot fires its eye laser across a street of houses while tanks roll in and a helicopter circles overhead"></div>
+    </div>
+  </section>
+
+  <section class="band" style="padding-top:0">
+    <div class="stats">
+      <div class="hud stat"><b>5</b><span>Worlds</span></div>
+      <div class="hud stat"><b>8</b><span>Robot skins</span></div>
+      <div class="hud stat"><b>31</b><span>Achievements</span></div>
+      <div class="hud stat"><b>1</b><span>Very large nuke</span></div>
+    </div>
+  </section>
+
+  <section class="band" id="gameplay">
+    <div class="wrap">
+      <div class="lab">Gameplay</div>
+      <h2 style="margin-top:10px">Walk right. Wreck everything.</h2>
+      <p class="lead" style="margin-top:16px">No puzzles and no stress. The fun is in the wrecking, and the game rewards it with combo multipliers, scrap and plenty of screen shake.</p>
+
+      <div class="row">
+        <div class="hud shot"><img src="img/floors.jpg" width="1600" height="900" loading="lazy" alt="In Space Colony, the robot's laser cuts into a hab block under a giant blue planet as fires break out along the street"></div>
+        <div>
+          <div class="lab">Floor by floor</div>
+          <h3>Level the city. Literally.</h3>
+          <p>Cut a building at the base and the whole thing comes down. Hit it higher and you take off the top. Concrete crumbles, wood creaks, glass shatters and metal groans as it goes.</p>
+          <ul class="ticks">
+            <li>Aim the eye laser anywhere on screen</li>
+            <li>Punch shells and missiles straight back at the army</li>
+            <li>Jetpack up and stomp down on whole squads</li>
+            <li>Chain a fuel tank into a block-wide explosion</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row flip">
+        <div class="hud shot"><img src="img/nuke2.jpg" width="1600" height="900" loading="lazy" alt="A nuke detonates over Neon City, its fireball and shockwave ring tearing through the street"></div>
+        <div>
+          <div class="lab" style="color:var(--gold)">Ultimate</div>
+          <h3>The military brought tanks. You brought a nuke.</h3>
+          <p>Leveling buildings and taking down enemies charges the nuke meter. When it's full you'll hear a siren and a warhead whistle, then a white flash takes out everything on screen.</p>
+          <ul class="ticks">
+            <li>Charges across sectors as you wreck</li>
+            <li>Clears every enemy, building and incoming shot on screen</li>
+            <li>Full-screen flash, shockwave and mushroom cloud</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="hud shot"><img src="img/upgrade.jpg" width="1600" height="900" loading="lazy" alt="The Sector Cleared screen offering three upgrades: Servo Legs, Focused Beam and Volatile"></div>
+        <div>
+          <div class="lab">Every sector</div>
+          <h3>Clear it. Upgrade. Go again.</h3>
+          <p>Clear a sector and the gate opens. Then you pick one of three upgrades: a faster laser, heavier plating, Quake Fist shockwaves, bigger explosions and more. Upgrades stack for the rest of the run, and the army gets tougher with every sector.</p>
+          <ul class="ticks">
+            <li>11 upgrades that stack over a run</li>
+            <li>Rain, thunderstorms, fog and snow (lightning wrecks things too)</li>
+            <li>A quick training level that teaches every move</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="worlds" style="background:linear-gradient(180deg,transparent,rgba(11,18,32,.7) 20%,rgba(11,18,32,.7) 80%,transparent)">
+    <div class="wrap">
+      <div class="lab">Worlds</div>
+      <h2 style="margin-top:10px">Five worlds. One very large robot.</h2>
+      <p class="lead" style="margin-top:16px">Each world has its own skyline, weather, sounds, enemy lineup and a twist that changes how you play.</p>
+      <div class="worlds">
+        <article class="hud world" style="--wc:#46d6ff"><img src="img/city.jpg" width="1200" height="675" loading="lazy" alt="The City: suburbs with tanks and a helicopter"><div class="b"><span class="tag">The original</span><h3>The City</h3><p>Suburbs to downtown to the military base.</p><p class="en">Soldiers, jeeps, tanks, helicopters, jets, enemy mechs</p></div></article>
+        <article class="hud world" style="--wc:#b58cff"><img src="img/space.jpg" width="1200" height="675" loading="lazy" alt="Space Colony: lunar base under a blue planet with flying saucers and a tripod"><div class="b"><span class="tag">Low gravity</span><h3>Space Colony</h3><p>A lunar base under a giant blue planet. Floaty jumps.</p><p class="en">Moon Buggies, Flying Saucers, Star Darts, the Tripod</p></div></article>
+        <article class="hud world" style="--wc:#5ff2a6"><img src="img/jungle.jpg" width="1200" height="675" loading="lazy" alt="Jungle Village: the Monster breathes fire at stilt huts while war balloons float overhead"><div class="b"><span class="tag">Giant trees</span><h3>Jungle Village</h3><p>Stilt huts and temple ruins. Giant trees soak up your laser.</p><p class="en">War Elephants, War Balloons, Bush Planes, the Stone Brute</p></div></article>
+        <article class="hud world" style="--wc:#9ad8ff"><img src="img/arctic.jpg" width="1200" height="675" loading="lazy" alt="Arctic Base: twin-rotor transports fly over snowy research stations"><div class="b"><span class="tag">Ice &amp; snow</span><h3>Arctic Base</h3><p>Research stations on an ice shelf. You slide on the ice.</p><p class="en">Snowmobiles, Ice Crawlers, Arctic Bombers, the Yeti</p></div></article>
+        <article class="hud world" style="--wc:#ff4ac0"><img src="img/neon.jpg" width="1200" height="675" loading="lazy" alt="Neon City: the Gold Plated robot fires a golden beam down a rain-soaked neon street"><div class="b"><span class="tag">Always night</span><h3>Neon City</h3><p>Rain-soaked cyberpunk streets, from nightclubs to Precinct HQ.</p><p class="en">Spider Tanks, Police Flyers, Drones, the Riot Enforcer</p></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="skins">
+    <div class="wrap">
+      <div class="lab" style="color:var(--gold)">Skins</div>
+      <h2 style="margin-top:10px">Unlock a monster that breathes fire.</h2>
+      <p class="lead" style="margin-top:16px">Earn scrap from every run and spend it on new robots. Skins are cosmetic only, so every robot plays the same.</p>
+      <div class="carhead"><span class="meta">Swipe to see all eight</span><div class="carbtns"><button type="button" class="cb" id="prev" aria-label="Previous skins">‹</button><button type="button" class="cb" id="next" aria-label="Next skins">›</button></div></div>
+      <ul class="car" id="car" aria-label="Robot skins">
+          <li class="hud sc" style="--sc:#ff8a3d"><img src="img/skins/monster.jpg" width="564" height="436" loading="lazy" alt="The Monster skin on a lit pedestal"><div class="b"><h3>Monster</h3><p>A scarred kaiju with bone plates and molten cracks. It breathes fire.</p></div></li>
+          <li class="hud sc" style="--sc:#5ff2a6"><img src="img/skins/xeno.jpg" width="564" height="436" loading="lazy" alt="The Xeno skin on a lit pedestal"><div class="b"><h3>Xeno</h3><p>A hunched chitin predator with scythe claws, a cluster of eyes and a bio-ray.</p></div></li>
+          <li class="hud sc" style="--sc:#ffd36a"><img src="img/skins/gold.jpg" width="564" height="436" loading="lazy" alt="The Gold Plated skin on a lit pedestal"><div class="b"><h3>Gold Plated</h3><p>24-karat armor and a golden beam. Pure flex.</p></div></li>
+          <li class="hud sc" style="--sc:#46e0d0"><img src="img/skins/retro.jpg" width="564" height="436" loading="lazy" alt="The Retro Tin Toy skin on a lit pedestal"><div class="b"><h3>Retro Tin Toy</h3><p>A wind-up tin robot with a box head, claw hands and a turning key.</p></div></li>
+          <li class="hud sc" style="--sc:#cfe6ff"><img src="img/skins/chrome.jpg" width="564" height="436" loading="lazy" alt="The Chrome skin on a lit pedestal"><div class="b"><h3>Chrome</h3><p>Mirror-polished plating with an icy blue beam.</p></div></li>
+          <li class="hud sc" style="--sc:#ff4a6a"><img src="img/skins/stealth.jpg" width="564" height="436" loading="lazy" alt="The Stealth Black skin on a lit pedestal"><div class="b"><h3>Stealth Black</h3><p>Matte black armor with red trim, built for night ops.</p></div></li>
+          <li class="hud sc" style="--sc:#9cc66b"><img src="img/skins/camo.jpg" width="564" height="436" loading="lazy" alt="The Jungle Camo skin on a lit pedestal"><div class="b"><h3>Jungle Camo</h3><p>Woodland camouflage. The jungle approves.</p></div></li>
+          <li class="hud sc" style="--sc:#b4c2d0"><img src="img/skins/standard.jpg" width="564" height="436" loading="lazy" alt="The Standard Issue skin on a lit pedestal"><div class="b"><h3>Standard Issue</h3><p>The RX-07, steel gray with a red visor, as it left the factory.</p></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" id="bosses" style="padding-top:0">
+    <div class="wrap">
+      <div class="lab" style="color:var(--red)">The opposition</div>
+      <h2 style="margin-top:10px">The army brought backup.</h2>
+      <p class="lead" style="margin-top:16px">Every world sends its own heavy hitters, and each one fights differently. Anything they throw at you can be punched right back.</p>
+      <div class="grid">
+        <div class="hud card" style="--wc:#b58cff"><span class="tag">Space Colony</span><h3>The Tripod</h3><p>A three-legged war machine with a purple dome and a glowing heat-ray arm. You'll hear its deep horn before you see it.</p></div>
+        <div class="hud card" style="--wc:#5ff2a6"><span class="tag">Jungle Village</span><h3>The Stone Brute</h3><p>A knuckle-walking rock beast covered in moss and glowing crystals. It winds up and lobs boulders that shatter and shake the screen.</p></div>
+        <div class="hud card" style="--wc:#9ad8ff"><span class="tag">Arctic Base</span><h3>The Yeti</h3><p>A shaggy snow beast with curled horns and ice-blue eyes. It roars a spinning ice shard that bursts into frost.</p></div>
+        <div class="hud card" style="--wc:#ff4ac0"><span class="tag">Neon City</span><h3>The Riot Enforcer</h3><p>A chrome riot robot with flashing light bars and an arm cannon, hiding behind a tall neon-edged shield.</p></div>
+        <div class="hud card" style="--wc:#5ff2a6"><span class="tag">Jungle Village</span><h3>War Elephants</h3><p>Armored elephants carrying cannons. They trumpet on arrival and topple when you take them down.</p></div>
+        <div class="hud card" style="--wc:#46d6ff"><span class="tag">The City</span><h3>Enemy Mechs</h3><p>Robots built to fight robots. They fire plasma and get tougher, faster and meaner every level.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band closer">
+    <div class="wrap">
+      <h2>Every building. Every sector.</h2>
+      <p class="lead">No survivors (architecturally speaking). A modern remake of the 2010 classic, rebuilt with new visuals, haptics, worlds, skins and a nuke.</p>
+      <div class="cta"><a class="btn p" href="#support">Get support</a></div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= PRIVACY ================= -->
+<div data-view="privacy" hidden>
+  <section class="band">
+    <div class="doc">
+      <div class="lab">Legal</div>
+      <h1>Privacy Policy</h1>
+      <p class="meta">Robot Rampage Reloaded · American Made Games · Effective November 21, 2026</p>
+
+      <div class="hud big"><div class="lab">The short version</div><p>We don't collect any data. None.</p></div>
+
+      <h2>What we collect</h2>
+      <p>Nothing. Robot Rampage Reloaded does not collect, store, transmit, sell or share any personal information or usage data. It has no accounts, sign-ups, advertising, analytics or tracking, and it doesn't use any third-party services that collect data.</p>
+
+      <h2>What stays on your device</h2>
+      <p>To remember your progress, the game saves a few things in its own storage on your device:</p>
+      <ul>
+        <li>Your settings (sound, haptics, control size, graphics)</li>
+        <li>High scores, stats and achievements</li>
+        <li>Your scrap balance and the skins and worlds you've unlocked</li>
+      </ul>
+      <p>This information never leaves your device and is never sent to us or anyone else. You can reset your stats in Settings, and deleting the app removes all of it.</p>
+
+      <h2>Network access</h2>
+      <p>The game works fully offline and doesn't need an internet connection to play.</p>
+
+      <h2>Children's privacy</h2>
+      <p>Because we don't collect any information from anyone, we don't collect information from children.</p>
+
+      <h2>Changes to this policy</h2>
+      <p>If this policy ever changes, we'll post the update on this page and change the effective date above.</p>
+
+      <h2>Contact</h2>
+      <p>Questions about privacy? Email <a href="mailto:developer@americanmadegames.com">developer@americanmadegames.com</a>.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= SUPPORT ================= -->
+<div data-view="support" hidden>
+  <section class="band">
+    <div class="doc">
+      <div class="lab">Help</div>
+      <h1>Support</h1>
+      <p class="lead">Robot Rampage Reloaded is made by <strong style="color:var(--ink)">American Made Games</strong>. If you've found a bug, have a question or just want to say hi, send us an email.</p>
+
+      <div class="hud big mail">
+        <div class="lab" style="color:var(--cy)">Email the developer</div>
+        <div class="addr" id="addr">developer@americanmadegames.com</div>
+        <div class="row2">
+          <a class="btn p" href="mailto:developer@americanmadegames.com?subject=Robot%20Rampage%20Reloaded%20support">Send email</a>
+          <button class="btn o" type="button" id="copy" style="cursor:pointer">Copy address</button>
+        </div>
+        <div class="copied" id="copied" aria-live="polite"></div>
+      </div>
+      <p class="meta">To help us fix things faster, please include your device model, your iOS version and the app version. The version number is in the bottom-right corner of the main menu.</p>
+
+      <h2>Common questions</h2>
+      <details><summary>How do I play?</summary><div><p>Walk right and level every building in the sector to open the gate at the end. Hold your finger anywhere on screen to aim the laser. Use ‹ › to walk, ˄ to jump and fly with the jetpack, and the fist to punch. When the nuke is charged, tap ☢. You can replay the Training level from the main menu at any time.</p></div></details>
+      <details><summary>The gate won't open</summary><div><p>The gate opens only after every building in the sector is down. Red arrows at the edge of the screen point to buildings you've missed behind you. A building only counts once its ground floor is destroyed, so aim the laser at the base.</p></div></details>
+      <details><summary>How do I unlock new worlds and skins?</summary><div><p>Every run pays out scrap, even if you quit to the menu. You earn more for higher scores, reaching later levels, beating your best, unlocking achievements and your first run of the day. Spend it in the Shop to unlock new worlds and robot skins.</p></div></details>
+      <details><summary>Do skins change how the robot plays?</summary><div><p>No. Skins are cosmetic only, and every robot plays the same.</p></div></details>
+      <details><summary>Where is my progress saved?</summary><div><p>On your device only. Settings → Reset stats &amp; high score clears your stats, but it keeps your scrap and the items you've unlocked. Deleting the app removes everything, and there's no way to restore it, because we never store a copy.</p></div></details>
+      <details><summary>The game feels slow on my device</summary><div><p>Go to Settings and set Graphics to Low. That uses fewer particles and skips some effects so the game runs faster on older devices. You can also turn on Show FPS to check performance.</p></div></details>
+      <details><summary>I can't hear anything, or I don't feel haptics</summary><div><p>Check that Sound and Haptics are on in Settings and that your device isn't in silent mode.</p></div></details>
+      <details><summary>The touch buttons are too small or too big</summary><div><p>Settings → Control size lets you choose Small, Medium or Large.</p></div></details>
+
+      <h2>Requirements</h2>
+      <p>iPhone or iPad running iOS 15 or later. No internet connection needed.</p>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer>
+  <div class="foot">
+    <span>© 2026 American Made Games. Robot Rampage Reloaded.</span>
+    <nav aria-label="Footer"><a href="#top">Home</a><a href="#support">Support</a><a href="#privacy">Privacy</a><a href="mailto:developer@americanmadegames.com">Contact</a></nav>
+  </div>
+</footer>
+
+<script>
+{
+  const views = ['privacy', 'support'];
+  const els = document.querySelectorAll('[data-view]');
+  const navLinks = document.querySelectorAll('.links a');
+  let current = null;
+  const route = () => {
+    const h = location.hash.slice(1);
+    const view = views.includes(h) ? h : 'home';
+    const changed = view !== current;
+    current = view;
+    els.forEach(e => { e.hidden = e.dataset.view !== view; });
+    navLinks.forEach(a => { if (a.getAttribute('href') === '#' + view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    document.title = view === 'home' ? 'Robot Rampage Reloaded' : (view === 'privacy' ? 'Privacy Policy' : 'Support') + ' · Robot Rampage Reloaded';
+    if (view !== 'home' || h === 'top' || !h) { if (changed || h === 'top') window.scrollTo(0, 0); }
+    else if (changed) { const t = document.getElementById(h); if (t) requestAnimationFrame(() => t.scrollIntoView()); }
+  };
+  addEventListener('hashchange', route);
+  route();
+
+  const fx = document.getElementById('fx');
+  const n = matchMedia('(max-width:600px)').matches ? 14 : 28;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span');
+    s.className = 'em' + (i % 5 === 0 ? ' g' : '');
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.animationDuration = (10 + Math.random() * 14) + 's';
+    s.style.animationDelay = (-Math.random() * 20) + 's';
+    fx.appendChild(s);
+  }
+
+  const car = document.getElementById('car'), pv = document.getElementById('prev'), nx = document.getElementById('next');
+  const step = () => { const c = car.querySelector('li'); return c ? c.getBoundingClientRect().width + 16 : 300; };
+  const upd = () => { pv.disabled = car.scrollLeft < 4; nx.disabled = car.scrollLeft > car.scrollWidth - car.clientWidth - 4; };
+  pv.addEventListener('click', () => car.scrollBy({ left: -step(), behavior: 'smooth' }));
+  nx.addEventListener('click', () => car.scrollBy({ left: step(), behavior: 'smooth' }));
+  car.addEventListener('scroll', upd, { passive: true }); addEventListener('resize', upd); upd();
+
+  const btn = document.getElementById('copy'), msg = document.getElementById('copied');
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText('developer@americanmadegames.com'); msg.textContent = 'Copied to clipboard'; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents(document.getElementById('addr')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); msg.textContent = 'Selected. Press copy to finish.'; }
+  });
+}
+</script>
+</body>
+</html>
